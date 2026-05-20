@@ -1057,12 +1057,14 @@ async function fetchMLPrediction() {
     <div class="ml-result-grid">
       <div>
         <p class="metric-label">ML prediction</p>
-        <strong class="metric-value ${colClass}" style="font-size:22px;margin-bottom:10px">${data.predicted_label}</strong>
-        <div class="score-bar-wrap ${barClass}" style="max-width:400px;margin-top:4px">
-          <div class="score-bar" style="height:10px">
+        <div style="display:flex;align-items:baseline;gap:14px;margin-bottom:10px">
+          <strong class="metric-value ${colClass}" style="font-size:26px">${data.predicted_label}</strong>
+          <span class="ml-prob-num ${colClass}">${prob}%</span>
+        </div>
+        <div class="score-bar-wrap ${barClass}" style="max-width:400px">
+          <div class="score-bar" style="height:8px">
             <div class="score-bar-fill" style="width:${prob}%"></div>
           </div>
-          <span class="score-bar-num">${prob}%</span>
         </div>
         ${phenotypeHtml}
         <p class="table-muted" style="margin-top:10px;font-size:12px">

@@ -123,9 +123,29 @@
 <div id="view-start" class="view active">
   <div class="start-wrap">
     <div class="start-card">
-      <p class="eyebrow" style="margin-bottom:12px">Clinical decision support</p>
+      <div class="start-mark" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 30 30" fill="none" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 15h6l3.5-9L18 24l3.5-9H28"/>
+        </svg>
+      </div>
+      <p class="eyebrow" style="margin-bottom:10px">Clinical decision support</p>
       <h1 class="start-title">PolyClear</h1>
       <p class="start-sub">Clinician-facing PCOS diagnostic support — Rotterdam criteria, XGBoost ML assessment, and phenotype classification in a single workflow.</p>
+
+      <div class="start-stats">
+        <div class="start-stat">
+          <span class="start-stat-num">541</span>
+          <span class="start-stat-label">Training patients</span>
+        </div>
+        <div class="start-stat">
+          <span class="start-stat-num">52</span>
+          <span class="start-stat-label">Engineered features</span>
+        </div>
+        <div class="start-stat">
+          <span class="start-stat-num">0.959</span>
+          <span class="start-stat-label">ROC-AUC</span>
+        </div>
+      </div>
 
       <div class="start-pillars">
         <div class="start-pillar">
@@ -209,10 +229,10 @@
       <section class="panel-section">
         <p class="panel-label">Demo cases</p>
         <div class="demo-stack">
-          <button type="button" class="demo-chip chip-red"    onclick="loadDemo('pcos_positive')">PCOS Positive</button>
-          <button type="button" class="demo-chip chip-purple" onclick="loadDemo('pcos_possible')">PCOS Possible — Mimics Present</button>
-          <button type="button" class="demo-chip chip-amber"  onclick="loadDemo('mimic_probable')">Mimic Condition Probable</button>
-          <button type="button" class="demo-chip chip-blue"   onclick="loadDemo('assessment_deferred')">Assessment Deferred</button>
+          <button type="button" class="demo-chip chip-red"    onclick="loadDemo('pcos_positive')">PCOS Positive<small class="chip-hint">C1 + C2 + C3 · 3/3 Rotterdam</small></button>
+          <button type="button" class="demo-chip chip-purple" onclick="loadDemo('pcos_possible')">PCOS Possible — Mimics Present<small class="chip-hint">C1 + C2 · Thyroid flagged</small></button>
+          <button type="button" class="demo-chip chip-amber"  onclick="loadDemo('mimic_probable')">Mimic Condition Probable<small class="chip-hint">C2 only · TSH elevated</small></button>
+          <button type="button" class="demo-chip chip-blue"   onclick="loadDemo('assessment_deferred')">Assessment Deferred<small class="chip-hint">Age 12 · Menarche rule</small></button>
         </div>
       </section>
 
@@ -586,7 +606,7 @@
     </section>
 
     <section class="results-grid">
-      <article class="result-card">
+      <article class="result-card card-rotterdam">
         <header class="result-card-head">Rotterdam criteria</header>
         <div class="table-scroll">
           <table class="result-table">
@@ -596,7 +616,7 @@
         </div>
       </article>
 
-      <article class="result-card">
+      <article class="result-card card-exclusion">
         <header class="result-card-head">Exclusion flags</header>
         <div class="table-scroll">
           <table class="result-table">
@@ -606,7 +626,7 @@
         </div>
       </article>
 
-      <article class="result-card">
+      <article class="result-card card-support">
         <header class="result-card-head">Support score breakdown</header>
         <div class="table-scroll">
           <table class="result-table">
@@ -616,13 +636,13 @@
         </div>
       </article>
 
-      <article class="result-card chart-card">
+      <article class="result-card chart-card card-support">
         <header class="result-card-head">Factor chart</header>
         <canvas id="factorChart"></canvas>
         <div class="chart-fallback" id="factorChartFallback"></div>
       </article>
 
-      <article class="result-card wide" id="ml-card">
+      <article class="result-card wide card-ml" id="ml-card">
         <header class="result-card-head">
           XGBoost ML assessment
           <span class="mock-tag">ROC-AUC 0.959</span>
@@ -632,7 +652,7 @@
         </div>
       </article>
 
-      <article class="result-card wide">
+      <article class="result-card wide card-population">
         <header class="result-card-head">
           Population context
           <span class="mock-tag">mock reference data</span>
@@ -650,7 +670,7 @@
         </div>
       </article>
 
-      <article class="result-card wide">
+      <article class="result-card wide card-summary">
         <header class="result-card-head">Final summary</header>
         <div class="table-scroll">
           <table class="result-table">

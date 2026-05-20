@@ -609,8 +609,10 @@ input[type="number"]:focus {
 
 .verdict-title {
   margin-top: 12px;
-  font-size: 30px;
-  line-height: 1.15;
+  font-size: 44px;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
 }
 
 .verdict-text {
@@ -1980,4 +1982,139 @@ input[type="number"]:focus {
     box-shadow: none;
     break-inside: avoid;
   }
+}
+
+/* ── UI polish ───────────────────────────────────────────────────────────── */
+
+/* Start screen: logo mark */
+.start-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 22px;
+  background: linear-gradient(135deg, var(--primary) 0%, #00a6b2 100%);
+  border-radius: 18px;
+  box-shadow:
+    0 20px 48px rgba(22, 104, 90, 0.38),
+    0 0 0 8px rgba(22, 104, 90, 0.10);
+  animation: markFloat 5s ease-in-out infinite;
+}
+
+/* Start screen: gradient title */
+.start-title {
+  background: linear-gradient(140deg, var(--primary) 0%, #00b4c8 55%, var(--primary-dark) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* Start screen: stats row */
+.start-stats {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.start-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 28px;
+}
+
+.start-stat + .start-stat {
+  border-left: 1px solid var(--line);
+}
+
+.start-stat-num {
+  font-family: var(--mono);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.start-stat-label {
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Demo chip sub-label */
+.chip-hint {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  opacity: 0.62;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Bigger probability in ML card */
+.ml-prob-num {
+  font-family: var(--mono);
+  font-size: 54px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+/* Verdict badge: slightly more padding */
+.verdict-badge {
+  padding: 5px 14px;
+  font-size: 12px;
+}
+
+/* Result card: coloured top accent stripe by type */
+.result-card.card-rotterdam { border-top: 3px solid var(--primary); }
+.result-card.card-exclusion  { border-top: 3px solid var(--amber); }
+.result-card.card-support    { border-top: 3px solid var(--blue); }
+.result-card.card-ml         { border-top: 3px solid var(--red); }
+.result-card.card-population { border-top: 3px solid var(--purple); }
+.result-card.card-summary    { border-top: 3px solid var(--muted-2); }
+
+/* Criteria card: larger criterion badge */
+.criterion-title > span {
+  width: 40px;
+  height: 40px;
+  font-size: 14px;
+}
+
+/* Step nav: run button stands out more */
+.run-full {
+  font-size: 15px;
+  padding: 11px 28px;
+  box-shadow: 0 8px 24px rgba(22, 104, 90, 0.22);
+}
+
+/* Header: h1 slightly tighter */
+.app-header h1 {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+@keyframes markFloat {
+  0%, 100% { transform: translateY(0) rotate(0deg); box-shadow: 0 20px 48px rgba(22, 104, 90, 0.38), 0 0 0 8px rgba(22, 104, 90, 0.10); }
+  50% { transform: translateY(-7px) rotate(1deg); box-shadow: 0 28px 56px rgba(22, 104, 90, 0.44), 0 0 0 12px rgba(22, 104, 90, 0.08); }
+}
+
+@media (max-width: 560px) {
+  .start-stats { flex-direction: column; gap: 14px; }
+  .start-stat + .start-stat { border-left: none; border-top: 1px solid var(--line); padding: 14px 0 0; }
+  .ml-prob-num { font-size: 40px; }
+  .verdict-title { font-size: 32px; }
 }
