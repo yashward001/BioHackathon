@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="PolyClear clinician-facing PCOS diagnostic support tool">
+  <title>PolyClear | PCOS Diagnostic Support</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <style>
+    #rule-guardrail-banner {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      background: #fef3c7;
+      border: 1px solid #f59e0b;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-top: 14px;
+      gap: 10px;
+    }
+    #rule-guardrail-banner .rg-inner {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      flex: 1;
+    }
+    #rule-guardrail-banner .rg-icon { font-size: 15px; line-height: 1.4; flex-shrink: 0; }
+    #rule-guardrail-banner .rg-msg  { font-size: 13px; line-height: 1.6; color: #92400e; }
+    #rule-guardrail-banner .rg-close {
+      background: none; border: none; cursor: pointer;
+      color: #92400e; font-size: 14px; padding: 0;
+      line-height: 1; flex-shrink: 0;
+    }
+
+    /* ── Start screen ───────────────────────────────────────────────────── */
+    .start-wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+      background: var(--page);
+    }
+    .start-card {
+      width: min(680px, 100%);
+      text-align: center;
+    }
+    .start-title {
+      font-size: clamp(44px, 8vw, 72px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+    .start-sub {
+      font-size: 16px;
+      line-height: 1.65;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 40px;
+    }
+    .start-pillars {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 40px;
+      text-align: left;
+    }
+    .start-pillar {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 18px 16px;
+    }
+    .start-pillar-num {
+      display: block;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--primary);
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+    .start-pillar strong {
+      display: block;
+      font-size: 13px;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .start-pillar p {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.55;
+      margin: 0;
+    }
+    .start-cta {
+      font-size: 15px;
+      padding: 13px 36px;
+      border-radius: var(--radius);
+      margin-bottom: 20px;
+    }
+    .start-disclaimer {
+      font-size: 11px;
+      color: var(--muted-2);
+      line-height: 1.6;
+      max-width: 460px;
+      margin: 0 auto;
+    }
+    @media (max-width: 560px) {
+      .start-pillars { grid-template-columns: 1fr; }
+      .start-title { font-size: 48px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Start screen ──────────────────────────────────────────────────────── -->
+<div id="view-start" class="view active">
+  <div class="start-wrap">
+    <div class="start-card">
+      <p class="eyebrow" style="margin-bottom:12px">Clinical decision support</p>
+      <h1 class="start-title">PolyClear</h1>
+      <p class="start-sub">Clinician-facing PCOS diagnostic support — Rotterdam criteria, XGBoost ML assessment, and phenotype classification in a single workflow.</p>
+
+      <div class="start-pillars">
+        <div class="start-pillar">
+          <span class="start-pillar-num">01</span>
+          <strong>Exclusion screen</strong>
+          <p>Flags pregnancy, thyroid, hyperprolactinaemia, and endometrial risk before any PCOS interpretation.</p>
+        </div>
+        <div class="start-pillar">
+          <span class="start-pillar-num">02</span>
+          <strong>Rotterdam criteria</strong>
+          <p>Hyperandrogenism, ovulatory dysfunction, and polycystic morphology — each with supporting evidence.</p>
+        </div>
+        <div class="start-pillar">
+          <span class="start-pillar-num">03</span>
+          <strong>ML assessment</strong>
+          <p>XGBoost model (ROC-AUC 0.959) with SHAP-derived phenotype classification across 52 engineered features.</p>
+        </div>
+      </div>
+
+      <button type="button" class="btn-primary start-cta" onclick="goTo('view-form')">
+        Begin assessment
+      </button>
+
+      <p class="start-disclaimer">
+        For clinical decision support only — not a substitute for clinician judgement.
+        Results must be reviewed in the context of the full clinical picture.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div id="view-form" class="view">
+  <header class="app-header">
+    <div>
+      <p class="eyebrow">PCOS decision support</p>
+      <h1>PolyClear clinical intake</h1>
+    </div>
+    <div class="header-actions" aria-label="Case actions">
+      <button type="button" class="btn-secondary" onclick="goTo('view-landing')">Protocol</button>
+      <button type="button" class="btn-secondary" onclick="goTo('view-arch')">Architecture</button>
+      <button type="button" class="btn-secondary" onclick="resetCase()">Reset</button>
+      <button type="button" class="btn-primary" onclick="runAndShow()">Run assessment</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="case-panel" aria-label="Case workflow">
+      <section class="panel-section">
+        <p class="panel-label">Workflow</p>
+        <ol class="step-list">
+          <li class="step-item active" id="step-item-0">
+            <button type="button" onclick="nextStep(0)">
+              <span class="step-index">1</span>
+              <span>
+                <strong>Exclusion screen</strong>
+                <small>Pregnancy, thyroid, PRL, endometrium</small>
+              </span>
+            </button>
+          </li>
+          <li class="step-item" id="step-item-1">
+            <button type="button" onclick="nextStep(1)">
+              <span class="step-index">2</span>
+              <span>
+                <strong>Rotterdam criteria</strong>
+                <small>Hyperandrogenism, ovulation, morphology</small>
+              </span>
+            </button>
+          </li>
+          <li class="step-item" id="step-item-2">
+            <button type="button" onclick="nextStep(2)">
+              <span class="step-index">3</span>
+              <span>
+                <strong>Supporting factors</strong>
+                <small>Metabolic and contextual signals</small>
+              </span>
+            </button>
+          </li>
+        </ol>
+      </section>
+
+      <section class="panel-section">
+        <p class="panel-label">Demo cases</p>
+        <div class="demo-stack">
+          <button type="button" class="demo-chip chip-red"    onclick="loadDemo('classic_pcos')">Classic PCOS</button>
+          <button type="button" class="demo-chip chip-purple" onclick="loadDemo('mild_pcos')">Mild PCOS (Phenotype D)</button>
+          <button type="button" class="demo-chip chip-amber"  onclick="loadDemo('thyroid_mimic')">Thyroid mimic</button>
+          <button type="button" class="demo-chip chip-blue"   onclick="loadDemo('low_risk')">Low risk / negative</button>
+        </div>
+      </section>
+
+      <section class="panel-note">
+        <strong>Clinical guardrail</strong>
+        <span>Blank numeric fields are treated as missing, not normal. Results show a missing-data count.</span>
+      </section>
+    </aside>
+
+    <section class="intake-area">
+      <div class="form-alert" id="form-alert" role="status" aria-live="polite"></div>
+
+      <div class="step-dots" aria-label="Form progress">
+        <button type="button" class="step-dot active" id="dot-0" onclick="nextStep(0)" aria-label="Step 1"></button>
+        <button type="button" class="step-dot" id="dot-1" onclick="nextStep(1)" aria-label="Step 2"></button>
+        <button type="button" class="step-dot" id="dot-2" onclick="nextStep(2)" aria-label="Step 3"></button>
+      </div>
+
+      <section class="form-step active" id="step-0" aria-labelledby="step-0-title">
+        <div class="step-header">
+          <p class="step-tag">Step 1 of 3</p>
+          <h2 id="step-0-title">Exclusion screening</h2>
+          <p>Review common PCOS mimics before interpreting Rotterdam criteria.</p>
+        </div>
+
+        <div class="form-section">
+          <div class="section-head">
+            <div>
+              <p class="section-label">Patient demographics</p>
+              <h3>Age — required for age-stratified guardrails</h3>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="age">Patient age <span>years</span></label>
+              <p class="threshold">Used to apply 2023 PCOS guideline age rules (adolescent, adult, ≥35)</p>
+              <input type="number" id="age" placeholder="26" min="1" max="120" step="1" inputmode="numeric">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section priority-section">
+          <div class="section-head">
+            <div>
+              <p class="section-label">Rule-out conditions</p>
+              <h3>Required clinical safety checks</h3>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="tsh">TSH <span>mIU/L</span></label>
+              <p class="threshold">&lt;0.4 hyperthyroid signal; &gt;4.0 hypothyroid signal</p>
+              <input type="number" id="tsh" placeholder="2.1" step="0.1" min="0" inputmode="decimal">
+            </div>
+            <div class="form-group">
+              <label for="beta_hcg">Beta-hCG <span>mIU/mL</span></label>
+              <p class="threshold">&gt;5 indicates pregnancy; assessment is deferred</p>
+              <input type="number" id="beta_hcg" placeholder="1.2" step="0.1" min="0" inputmode="decimal">
+            </div>
+            <div class="form-group">
+              <label for="prl">Prolactin / PRL <span>ng/mL</span></label>
+              <p class="threshold">&gt;25 mild flag; &gt;52.9 significant flag</p>
+              <input type="number" id="prl" placeholder="14" step="0.1" min="0" inputmode="decimal">
+            </div>
+            <div class="form-group">
+              <label for="endo_thickness">Endometrial thickness <span>mm</span></label>
+              <p class="threshold">&gt;15 at risk; &gt;20 high risk</p>
+              <input type="number" id="endo_thickness" placeholder="8" step="0.1" min="0" inputmode="decimal">
+            </div>
+          </div>
+        </div>
+
+        <div class="step-nav">
+          <span></span>
+          <button type="button" class="btn-primary" onclick="nextStep(1)">Next: Rotterdam</button>
+        </div>
+      </section>
+
+      <section class="form-step" id="step-1" aria-labelledby="step-1-title">
+        <div class="step-header">
+          <p class="step-tag">Step 2 of 3</p>
+          <h2 id="step-1-title">Rotterdam criteria</h2>
+          <p>PCOS is supported when at least two of three criteria are positive after exclusions are addressed.</p>
+        </div>
+
+        <div class="criteria-card cc-1">
+          <div class="criterion-title">
+            <span>C1</span>
+            <div>
+              <h3>Hyperandrogenism</h3>
+              <p>Clinical signs or biochemical support.</p>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group compact">
+              <label for="hair_growth">Excess hair growth / hirsutism</label>
+              <div class="toggle-row">
+                <label class="toggle"><input type="checkbox" id="hair_growth"><span></span></label>
+                <output class="toggle-value" id="v_hair_growth">No</output>
+              </div>
+            </div>
+            <div class="form-group compact">
+              <label for="pimples">Persistent acne</label>
+              <div class="toggle-row">
+                <label class="toggle"><input type="checkbox" id="pimples"><span></span></label>
+                <output class="toggle-value" id="v_pimples">No</output>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="lh_fsh">LH:FSH ratio</label>
+              <p class="threshold">&gt;2.0 supports C1</p>
+              <input type="number" id="lh_fsh" placeholder="2.4" step="0.1" min="0" inputmode="decimal">
+            </div>
+          </div>
+        </div>
+
+        <div class="criteria-card cc-2">
+          <div class="criterion-title">
+            <span>C2</span>
+            <div>
+              <h3>Ovulatory dysfunction</h3>
+              <p>Cycle pattern or luteal progesterone evidence.</p>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group compact">
+              <label for="irregular_cycle">Irregular menstrual cycle</label>
+              <div class="toggle-row">
+                <label class="toggle"><input type="checkbox" id="irregular_cycle"><span></span></label>
+                <output class="toggle-value" id="v_irregular_cycle">No</output>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="prg">Progesterone / PRG <span>nmol/L</span></label>
+              <p class="threshold">&lt;3.0 supports anovulation</p>
+              <input type="number" id="prg" placeholder="2.1" step="0.1" min="0" inputmode="decimal">
+            </div>
+          </div>
+        </div>
+
+        <div class="criteria-card cc-3">
+          <div class="criterion-title">
+            <span>C3</span>
+            <div>
+              <h3>Polycystic ovarian morphology</h3>
+              <p>Ultrasound morphology or AMH support.</p>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="follicle_num">Follicle count per ovary</label>
+              <p class="threshold">&ge;20 supports C3</p>
+              <input type="number" id="follicle_num" placeholder="22" min="0" inputmode="numeric">
+            </div>
+            <div class="form-group">
+              <label for="follicle_size">Average follicle size <span>mm</span></label>
+              <p class="threshold">2-9 mm morphology range</p>
+              <input type="number" id="follicle_size" placeholder="5.2" step="0.1" min="0" inputmode="decimal">
+            </div>
+            <div class="form-group">
+              <label for="amh">AMH <span>ng/mL</span></label>
+              <p class="threshold">&gt;4.59 supports C3</p>
+              <input type="number" id="amh" placeholder="6.2" step="0.1" min="0" inputmode="decimal">
+            </div>
+          </div>
+        </div>
+
+        <div class="step-nav">
+          <button type="button" class="btn-secondary" onclick="nextStep(0)">Back</button>
+          <button type="button" class="btn-primary" onclick="nextStep(2)">Next: Supporting factors</button>
+        </div>
+      </section>
+
+      <section class="form-step" id="step-2" aria-labelledby="step-2-title">
+        <div class="step-header">
+          <p class="step-tag">Step 3 of 3</p>
+          <h2 id="step-2-title">Supporting factors</h2>
+          <p>These factors explain phenotype and care priorities. They do not change the Rotterdam diagnostic gate.</p>
+        </div>
+
+        <div class="form-section">
+          <div class="section-head">
+            <div>
+              <p class="section-label">Metabolic context</p>
+              <h3>Obesity and insulin-resistance signals</h3>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="bmi">BMI</label>
+              <p class="threshold">&ge;25 overweight; &ge;30 obese</p>
+              <input type="number" id="bmi" placeholder="28.4" step="0.1" min="0" inputmode="decimal">
+            </div>
+            <div class="form-group">
+              <label for="waist">Waist circumference <span>cm</span></label>
+              <p class="threshold">&gt;88 cm abdominal obesity signal</p>
+              <input type="number" id="waist" placeholder="90" step="0.5" min="0" inputmode="decimal">
+            </div>
+            <div class="form-group">
+              <label for="whr">Waist:hip ratio</label>
+              <p class="threshold">&ge;0.85 central obesity risk</p>
+              <input type="number" id="whr" placeholder="0.88" step="0.01" min="0" inputmode="decimal">
+            </div>
+            <div class="form-group">
+              <label for="rbs">Random blood sugar <span>mg/dL</span></label>
+              <p class="threshold">&ge;140 flagged</p>
+              <input type="number" id="rbs" placeholder="155" min="0" inputmode="decimal">
+            </div>
+            <div class="form-group compact">
+              <label for="fast_food">Frequent fast food intake</label>
+              <div class="toggle-row">
+                <label class="toggle"><input type="checkbox" id="fast_food"><span></span></label>
+                <output class="toggle-value" id="v_fast_food">No</output>
+              </div>
+            </div>
+            <div class="form-group compact">
+              <label for="no_exercise">No regular exercise</label>
+              <div class="toggle-row">
+                <label class="toggle"><input type="checkbox" id="no_exercise"><span></span></label>
+                <output class="toggle-value" id="v_no_exercise">No</output>
+              </div>
+            </div>
+            <div class="form-group compact">
+              <label for="weight_gain">Recent weight gain</label>
+              <div class="toggle-row">
+                <label class="toggle"><input type="checkbox" id="weight_gain"><span></span></label>
+                <output class="toggle-value" id="v_weight_gain">No</output>
+              </div>
+            </div>
+            <div class="form-group compact">
+              <label for="skin_darkening">Skin darkening / acanthosis</label>
+              <div class="toggle-row">
+                <label class="toggle"><input type="checkbox" id="skin_darkening"><span></span></label>
+                <output class="toggle-value" id="v_skin_darkening">No</output>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <div class="section-head">
+            <div>
+              <p class="section-label">Other support signals</p>
+              <h3>Alopecia and nutritional context</h3>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group compact">
+              <label for="hair_loss">Hair loss / androgenic alopecia</label>
+              <div class="toggle-row">
+                <label class="toggle"><input type="checkbox" id="hair_loss"><span></span></label>
+                <output class="toggle-value" id="v_hair_loss">No</output>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="vit_d">Vitamin D3 <span>ng/mL</span></label>
+              <p class="threshold">&lt;20 deficient; &lt;10 severe</p>
+              <input type="number" id="vit_d" placeholder="14" step="0.5" min="0" inputmode="decimal">
+            </div>
+          </div>
+        </div>
+
+        <div class="step-nav">
+          <button type="button" class="btn-secondary" onclick="nextStep(1)">Back</button>
+          <button type="button" class="btn-primary run-full" onclick="runAndShow()">Run full assessment</button>
+        </div>
+      </section>
+    </section>
+  </main>
+</div>
+
+<div id="view-results" class="view">
+  <header class="app-header compact-header">
+    <div>
+      <p class="eyebrow">Assessment output</p>
+      <h1>Diagnostic results</h1>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn-secondary" onclick="goTo('view-form')">Edit inputs</button>
+      <button type="button" class="btn-secondary" onclick="resetCase()">New case</button>
+      <button type="button" class="btn-primary" onclick="window.print()">Print summary</button>
+    </div>
+  </header>
+
+  <main class="results-wrap">
+    <section class="verdict-hero" id="verdict-hero">
+      <div class="verdict-badge" id="verdict-badge">Pending</div>
+      <h2 class="verdict-title" id="verdict-title">Run an assessment</h2>
+      <p class="verdict-text" id="verdict-text">Complete the intake form to generate an explainable output.</p>
+      <div id="rule-guardrail-banner" style="display:none">
+        <div class="rg-inner">
+          <span class="rg-icon">&#9888;</span>
+          <span class="rg-msg" id="rule-guardrail-text"></span>
+        </div>
+        <button class="rg-close" onclick="this.parentElement.style.display='none'" type="button" aria-label="Dismiss">&#x2715;</button>
+      </div>
+    </section>
+
+    <section class="engine-preview" id="engine-preview" aria-label="Diagnostic pathway trace">
+      <div class="engine-head">
+        <div>
+          <p class="engine-kicker">Rule engine trace</p>
+          <h2>Diagnostic pathway</h2>
+        </div>
+        <strong class="engine-verdict-pill" id="engine-verdict-pill">Awaiting run</strong>
+      </div>
+      <div class="engine-track">
+        <article class="engine-node" id="engine-node-exclusion" style="--d:0">
+          <span class="node-pulse"></span>
+          <small>01</small>
+          <strong>Exclusions</strong>
+          <em id="engine-status-exclusion">Pending</em>
+        </article>
+        <div class="engine-rail" aria-hidden="true"></div>
+        <div class="engine-cluster">
+          <article class="engine-node" id="engine-node-c1" style="--d:1">
+            <span class="node-pulse"></span>
+            <small>C1</small>
+            <strong>Hyperandrogenism</strong>
+            <em id="engine-status-c1">Pending</em>
+          </article>
+          <article class="engine-node" id="engine-node-c2" style="--d:2">
+            <span class="node-pulse"></span>
+            <small>C2</small>
+            <strong>Ovulatory dysfunction</strong>
+            <em id="engine-status-c2">Pending</em>
+          </article>
+          <article class="engine-node" id="engine-node-c3" style="--d:3">
+            <span class="node-pulse"></span>
+            <small>C3</small>
+            <strong>Ovarian morphology</strong>
+            <em id="engine-status-c3">Pending</em>
+          </article>
+        </div>
+        <div class="engine-rail" aria-hidden="true"></div>
+        <article class="engine-node engine-output" id="engine-node-output" style="--d:4">
+          <span class="node-pulse"></span>
+          <small>OUT</small>
+          <strong>Verdict</strong>
+          <em id="engine-status-output">Pending</em>
+        </article>
+      </div>
+    </section>
+
+    <section class="metrics-grid" aria-label="Key metrics">
+      <div class="metric-tile">
+        <p class="metric-label">Verdict</p>
+        <strong class="metric-value" id="m_verdict">--</strong>
+      </div>
+      <div class="metric-tile">
+        <p class="metric-label">Rotterdam</p>
+        <strong class="metric-value" id="m_rotterdam">-- / 3</strong>
+      </div>
+      <div class="metric-tile score-tile">
+        <p class="metric-label">Support score</p>
+        <strong class="metric-value" id="m_score">--</strong>
+        <div class="score-ring-wrap"><canvas id="scoreRing" width="72" height="72"></canvas></div>
+      </div>
+      <div class="metric-tile">
+        <p class="metric-label">Strongest factor</p>
+        <strong class="metric-value metric-small" id="m_factor">--</strong>
+      </div>
+      <div class="metric-tile">
+        <p class="metric-label">Mimics flagged</p>
+        <strong class="metric-value metric-small" id="m_flags">--</strong>
+      </div>
+      <div class="metric-tile">
+        <p class="metric-label">Missing data</p>
+        <strong class="metric-value" id="m_missing">--</strong>
+      </div>
+    </section>
+
+    <section class="results-grid">
+      <article class="result-card">
+        <header class="result-card-head">Rotterdam criteria</header>
+        <div class="table-scroll">
+          <table class="result-table">
+            <thead><tr><th>Criterion</th><th>Evidence</th><th>Result</th></tr></thead>
+            <tbody id="tbl_rotterdam"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="result-card">
+        <header class="result-card-head">Exclusion flags</header>
+        <div class="table-scroll">
+          <table class="result-table">
+            <thead><tr><th>Condition</th><th>Marker</th><th>Status</th></tr></thead>
+            <tbody id="tbl_exclusions"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="result-card">
+        <header class="result-card-head">Support score breakdown</header>
+        <div class="table-scroll">
+          <table class="result-table">
+            <thead><tr><th>Factor</th><th>Signals</th><th>Score</th></tr></thead>
+            <tbody id="tbl_support"></tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="result-card chart-card">
+        <header class="result-card-head">Factor chart</header>
+        <canvas id="factorChart"></canvas>
+        <div class="chart-fallback" id="factorChartFallback"></div>
+      </article>
+
+      <article class="result-card wide" id="ml-card">
+        <header class="result-card-head">
+          XGBoost ML assessment
+          <span class="mock-tag">ROC-AUC 0.959</span>
+        </header>
+        <div id="ml-body">
+          <p class="table-muted">Run an assessment to see the ML prediction.</p>
+        </div>
+      </article>
+
+      <article class="result-card wide">
+        <header class="result-card-head">
+          Population context
+          <span class="mock-tag">mock reference data</span>
+        </header>
+        <div class="population-grid">
+          <div class="chart-panel">
+            <canvas id="popChart"></canvas>
+            <div class="chart-fallback" id="popChartFallback"></div>
+          </div>
+          <div class="population-legend" id="pop-legend">
+            <div><span class="legend-dot patient"></span>This patient</div>
+            <div><span class="legend-dot pcos"></span>Typical PCOS profile</div>
+            <div><span class="legend-dot reference"></span>Healthy reference</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="result-card wide">
+        <header class="result-card-head">Final summary</header>
+        <div class="table-scroll">
+          <table class="result-table">
+            <thead><tr><th>Field</th><th>Value</th><th>Notes</th></tr></thead>
+            <tbody id="tbl_summary"></tbody>
+          </table>
+        </div>
+      </article>
+    </section>
+
+    <p class="disclaimer">
+      This educational decision-support prototype does not replace clinician judgment, formal diagnostic workup,
+      or local guideline requirements. Interpret Rotterdam findings only after exclusion conditions are addressed.
+    </p>
+  </main>
+</div>
+
+<div id="view-landing" class="view">
+  <header class="app-header compact-header">
+    <div>
+      <p class="eyebrow">Clinical protocol</p>
+      <h1>PolyClear overview</h1>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn-primary" onclick="goTo('view-form')">Start intake</button>
+      <button type="button" class="btn-secondary" onclick="goTo('view-arch')">Architecture</button>
+    </div>
+  </header>
+
+  <main class="protocol-page">
+    <section class="protocol-hero">
+      <div>
+        <p class="eyebrow">Rotterdam-aligned</p>
+        <h2>Clinician-readable PCOS diagnostic support</h2>
+        <p>
+          PolyClear combines an exclusion screen, Rotterdam criteria, and supporting phenotype factors into
+          a transparent output that can be reviewed at the point of care.
+        </p>
+      </div>
+      <div class="protocol-panel">
+        <span>Output</span>
+        <strong>Verdict + evidence tables + support score</strong>
+      </div>
+    </section>
+
+    <section class="protocol-grid">
+      <article>
+        <span>1</span>
+        <h3>Screen exclusions first</h3>
+        <p>Pregnancy, thyroid dysfunction, hyperprolactinaemia, and endometrial risk are surfaced before PCOS interpretation.</p>
+      </article>
+      <article>
+        <span>2</span>
+        <h3>Apply Rotterdam criteria</h3>
+        <p>Hyperandrogenism, ovulatory dysfunction, and polycystic morphology are each shown with supporting evidence.</p>
+      </article>
+      <article>
+        <span>3</span>
+        <h3>Explain supporting factors</h3>
+        <p>Metabolic, insulin-resistance, alopecia, and vitamin D signals feed a non-diagnostic explanation score.</p>
+      </article>
+    </section>
+
+    <p class="disclaimer">
+      <strong>References</strong><br>
+      1. Rotterdam ESHRE/ASRM-Sponsored PCOS Consensus Workshop Group. Revised 2003 consensus on diagnostic criteria and long-term health risks related to polycystic ovary syndrome (PCOS). <em>Hum Reprod</em> 2004;19(1):41–47.<br>
+      2. Teede HJ et al. Recommendations from the 2023 International Evidence-based Guideline for the Assessment and Management of Polycystic Ovary Syndrome. <em>J Clin Endocrinol Metab</em> 2023;108(10):2447–2469.<br>
+      3. Phenotype distribution in European populations. <em>Eur J Obstet Gynecol Reprod Biol</em> 2022. doi:10.1016/j.ejogrb.2022.10.020<br>
+      4. Joham AE et al. Anti-Müllerian hormone as a marker of PCOS and predictor of metabolic risk. <em>Lancet Diabetes Endocrinol</em> 2022.
+    </p>
+  </main>
+</div>
+
+<div id="view-arch" class="view">
+  <header class="app-header compact-header">
+    <div>
+      <p class="eyebrow">Implementation view</p>
+      <h1>System architecture</h1>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn-secondary" onclick="goTo('view-landing')">Protocol</button>
+      <button type="button" class="btn-primary" onclick="goTo('view-form')">Start intake</button>
+    </div>
+  </header>
+
+  <main class="architecture-page">
+    <section class="architecture-flow" aria-label="System flow">
+      <article class="flow-block">
+        <p>Input layer</p>
+        <h2>Clinical markers</h2>
+        <div class="token-list">
+          <span>Symptoms</span><span>Hormones</span><span>Ultrasound</span><span>Metabolic markers</span><span>Exclusions</span>
+        </div>
+      </article>
+      <article class="flow-block">
+        <p>Rule engines</p>
+        <h2>Deterministic checks</h2>
+        <div class="engine-grid">
+          <div><strong>Mimic engine</strong><small>flags or defers</small></div>
+          <div><strong>Rotterdam engine</strong><small>counts 0-3 criteria</small></div>
+          <div><strong>Support engine</strong><small>explains phenotype</small></div>
+        </div>
+      </article>
+      <article class="flow-block">
+        <p>Output layer</p>
+        <h2>Clinician review</h2>
+        <div class="token-list">
+          <span>Verdict</span><span>Evidence tables</span><span>Charts</span><span>Missing data</span><span>Print summary</span>
+        </div>
+      </article>
+    </section>
+
+    <section class="model-section">
+      <h2>Data model</h2>
+      <pre class="code-block">PatientInput {
+  exclusions: TSH, betaHCG, PRL, endometrialThickness
+  rotterdam: hirsutism, acne, LHFSH, cycle, PRG, follicles, AMH
+  support: BMI, waist, WHR, lifestyle, RBS, acanthosis, alopecia, vitaminD
+}
+
+DiagnosisResult {
+  exclusionFlags, halted
+  rotterdamCount, pcos
+  supportFactors, supportScore
+  missingFields
+  verdict, interpretation
+}</pre>
+    </section>
+
+    <section class="model-section">
+      <h2>PCOS Phenotype Distribution</h2>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Relative prevalence of Rotterdam phenotypes among PCOS-positive cases — European population data</p>
+      <div style="height:160px;position:relative">
+        <canvas id="phenotypeChart"></canvas>
+      </div>
+      <p class="disclaimer" style="margin-top:14px">Source: European Journal of Obstetrics &amp; Gynecology and Reproductive Biology, doi:10.1016/j.ejogrb.2022.10.020</p>
+    </section>
+  </main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

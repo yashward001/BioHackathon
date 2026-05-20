@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+.env
+.vercel/
+node_modules/
+
+# large data/output files
+*.csv
+*.xlsx
+*.png
+90%

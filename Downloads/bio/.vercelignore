@@ -1,0 +1,12 @@
+# datasets & training artefacts
+*.csv
+*.xlsx
+*.ipynb
+*.png
+train_and_save.py
+model.py
+/predict.py
+/predict_batch.py
+run.sh
+__pycache__/
+*.pyc
