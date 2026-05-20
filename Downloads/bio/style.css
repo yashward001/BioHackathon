@@ -2107,14 +2107,167 @@ input[type="number"]:focus {
   font-weight: 800;
 }
 
-@keyframes markFloat {
-  0%, 100% { transform: translateY(0) rotate(0deg); box-shadow: 0 20px 48px rgba(22, 104, 90, 0.38), 0 0 0 8px rgba(22, 104, 90, 0.10); }
-  50% { transform: translateY(-7px) rotate(1deg); box-shadow: 0 28px 56px rgba(22, 104, 90, 0.44), 0 0 0 12px rgba(22, 104, 90, 0.08); }
-}
-
 @media (max-width: 560px) {
   .start-stats { flex-direction: column; gap: 14px; }
   .start-stat + .start-stat { border-left: none; border-top: 1px solid var(--line); padding: 14px 0 0; }
   .ml-prob-num { font-size: 40px; }
   .verdict-title { font-size: 32px; }
+}
+
+/* ── Sobriety pass: strip decorative noise ───────────────────────────────
+   Override animated backgrounds, hover lifts, shimmer sweeps, pulsing
+   elements, and atmospheric effects. Keep only functional motion.
+   ────────────────────────────────────────────────────────────────────── */
+
+/* Plain page background — no radial spotlight gradients */
+body {
+  background: var(--page);
+}
+
+/* Remove animated grid overlay and page-sweep flash */
+body::before,
+body::after {
+  display: none;
+}
+
+/* Remove rainbow pulse on header bottom edge */
+.app-header {
+  background: rgba(246, 247, 244, 0.94);
+}
+.app-header::after {
+  display: none;
+}
+
+/* Buttons: no shimmer sweep, no excessive lift */
+.btn-primary,
+.btn-secondary,
+.demo-chip {
+  transition: background 0.14s ease, border-color 0.14s ease,
+              color 0.14s ease, box-shadow 0.14s ease;
+}
+.btn-primary::before,
+.btn-secondary::before,
+.demo-chip::before {
+  display: none;
+}
+.btn-primary:hover {
+  transform: none;
+  box-shadow: 0 3px 12px rgba(22, 104, 90, 0.20);
+}
+.demo-chip:hover {
+  transform: none;
+}
+
+/* Cards: no translateY lift, no shimmer on hover */
+.panel-section,
+.panel-note,
+.form-section,
+.criteria-card,
+.metric-tile,
+.result-card,
+.protocol-grid article,
+.protocol-panel,
+.flow-block,
+.model-section {
+  transition: border-color 0.14s ease, box-shadow 0.14s ease;
+}
+.panel-section:hover,
+.panel-note:hover,
+.form-section:hover,
+.criteria-card:hover,
+.metric-tile:hover,
+.result-card:hover,
+.protocol-grid article:hover,
+.protocol-panel:hover,
+.flow-block:hover,
+.model-section:hover {
+  transform: none;
+  border-color: var(--line-strong);
+  box-shadow: 0 2px 8px rgba(29, 36, 33, 0.06);
+}
+.form-section::after,
+.criteria-card::after,
+.result-card::after,
+.metric-tile::after {
+  display: none;
+}
+
+/* Cards: plain white background, no shimmer gradient */
+.form-section,
+.criteria-card,
+.metric-tile,
+.result-card {
+  background: var(--surface);
+}
+
+/* Inputs: no lift on focus */
+input[type="number"]:focus {
+  transform: none;
+  box-shadow: 0 0 0 3px rgba(47, 105, 168, 0.14);
+}
+
+/* Verdict hero: no scan animation */
+.verdict-hero::before {
+  display: none;
+}
+
+/* Metric tile: simple top accent, no expanding gradient bar */
+.metric-tile::before {
+  background: var(--primary);
+  opacity: 0.25;
+  transform: scaleX(0);
+  transition: opacity 0.14s ease;
+}
+.metric-tile:hover::before {
+  transform: none;
+  opacity: 0.35;
+}
+
+/* Score ring: no breathing animation */
+.score-ring-wrap {
+  animation: none;
+  filter: none;
+}
+
+/* Pills: no pulsing glow */
+.pill-pos,
+.pill-high,
+.pill-flag {
+  animation: none;
+  box-shadow: none;
+}
+
+/* Step dot: no pulse ring */
+.step-dot.active {
+  animation: none;
+}
+
+/* Protocol hero: no rainbow bottom rail */
+.protocol-hero::after {
+  display: none;
+}
+
+/* Flow block: no internal grid pattern */
+.flow-block::before {
+  display: none;
+}
+
+/* Engine panel: clean dark surface, no atmospheric radial glow */
+.engine-preview {
+  background: #0e1a16;
+  box-shadow: 0 4px 20px rgba(10, 28, 22, 0.20);
+}
+.engine-preview::before {
+  display: none;
+}
+
+/* Start screen mark: static, no float animation */
+.start-mark {
+  animation: none;
+  box-shadow: 0 8px 28px rgba(22, 104, 90, 0.28), 0 0 0 6px rgba(22, 104, 90, 0.09);
+}
+
+/* Run button: remove oversized shadow */
+.run-full {
+  box-shadow: none;
 }
