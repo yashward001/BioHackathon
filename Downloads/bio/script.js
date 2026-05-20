@@ -8,33 +8,33 @@ let chartPhenotype = null;
 let currentDemo = null;
 
 const DEMO_RESULTS = {
-  classic_pcos: {
-    pcos_probability: 100.0,
+  pcos_positive: {
+    pcos_probability: 97.0,
     predicted_label: "PCOS",
     rotterdam_criteria: ["C1 Hyperandrogenism", "C2 Ovulatory dysfunction", "C3 Polycystic morphology"],
     phenotype: "Phenotype A — Classic/Full PCOS",
     age_guardrail: null
   },
-  mild_pcos: {
-    pcos_probability: 55.0,
+  pcos_possible: {
+    pcos_probability: 72.0,
     predicted_label: "PCOS",
-    rotterdam_criteria: ["C2 Ovulatory dysfunction", "C3 Polycystic morphology"],
-    phenotype: "Phenotype D — Non-hyperandrogenic PCOS",
+    rotterdam_criteria: ["C1 Hyperandrogenism", "C2 Ovulatory dysfunction"],
+    phenotype: "Phenotype B — Classic/NIH PCOS",
     age_guardrail: null
   },
-  thyroid_mimic: {
+  mimic_probable: {
     pcos_probability: 12.0,
     predicted_label: "Non-PCOS",
     rotterdam_criteria: [],
     phenotype: null,
     age_guardrail: null
   },
-  low_risk: {
-    pcos_probability: 4.0,
+  assessment_deferred: {
+    pcos_probability: 8.0,
     predicted_label: "Non-PCOS",
     rotterdam_criteria: [],
     phenotype: null,
-    age_guardrail: null
+    age_guardrail: "Diagnosis deferred (age 12): patient is likely within 2 years of menarche. Per 2023 International PCOS Guidelines, PCOS cannot be reliably diagnosed in this window."
   }
 };
 
@@ -84,53 +84,44 @@ const FIELD_LABELS = {
 };
 
 const DEMOS = {
-  classic_pcos: {
-    // Full PCOS — all 3 Rotterdam criteria, high ML probability
+  pcos_positive: {
+    // C1+C2+C3 all fire, no exclusion flags → "PCOS Positive"
     age: 25,
-    tsh: 2.0,   beta_hcg: 1.2, prl: 13,  endo_thickness: 7,
-    hair_growth: true,  pimples: true,
-    lh_fsh: 3.4,
-    irregular_cycle: true,  prg: 1.6,
-    follicle_num: 26,   follicle_size: 5.0,  amh: 9.2,
+    tsh: 2.2,  beta_hcg: 1.0, prl: 14,  endo_thickness: 8,
+    hair_growth: true,  pimples: true,  lh_fsh: 3.2,
+    irregular_cycle: true,  prg: 1.5,
+    follicle_num: 24,  follicle_size: 5.2,  amh: 9.0,
     bmi: 28.5,  waist: 91,  whr: 0.89,  rbs: 148,
     weight_gain: true,  skin_darkening: true,  fast_food: true,
     no_exercise: true,  hair_loss: true,  vit_d: 13
   },
-  mild_pcos: {
-    // Mild PCOS — C2+C3 only (Phenotype D), borderline ML probability
-    age: 33,
-    tsh: 2.6,   beta_hcg: 1.0, prl: 17,  endo_thickness: 9,
-    hair_growth: false, pimples: false,
-    lh_fsh: 1.0,
-    irregular_cycle: true,  prg: 1.3,
-    follicle_num: 28,   follicle_size: 5.2,  amh: 11.2,
-    bmi: 25.5,  waist: 84,  whr: 0.86,  rbs: 115,
-    weight_gain: false, skin_darkening: false, fast_food: false,
-    no_exercise: false, hair_loss: false, vit_d: 30
+  pcos_possible: {
+    // C1+C2 fire (2/3), TSH elevated → excluded before confirmation → "PCOS Possible — Mimics Present"
+    age: 34,
+    tsh: 5.8,  beta_hcg: 1.0, prl: 18,  endo_thickness: 9,
+    hair_growth: true,  pimples: false,  lh_fsh: 2.8,
+    irregular_cycle: true,  prg: 1.8,
+    follicle_num: 8,  follicle_size: 11.0,  amh: 2.1,
+    bmi: 27.0,  waist: 85,  whr: 0.87,  rbs: 118,
+    weight_gain: true,  skin_darkening: false,  fast_food: false,
+    no_exercise: false,  hair_loss: false,  vit_d: 25
   },
-  thyroid_mimic: {
-    // Thyroid-driven — elevated TSH, excluded before PCOS assessment
+  mimic_probable: {
+    // C2 only fires (1/3), TSH elevated → threshold not met, mimic flags present → "Mimic Condition Probable"
     age: 31,
-    tsh: 6.2,   beta_hcg: 1.0, prl: 18,  endo_thickness: 9,
-    hair_growth: true,  pimples: false,
-    lh_fsh: 1.4,
-    irregular_cycle: true,  prg: 4.8,
-    follicle_num: 10,   follicle_size: 6.0,  amh: 3.2,
+    tsh: 6.8,  beta_hcg: 1.0, prl: 18,  endo_thickness: 9,
+    hair_growth: false,  pimples: false,  lh_fsh: 1.4,
+    irregular_cycle: true,  prg: 4.5,
+    follicle_num: 8,  follicle_size: 11.0,  amh: 2.8,
     bmi: 26.0,  waist: 82,  whr: 0.80,  rbs: 120,
-    weight_gain: true,  skin_darkening: false, fast_food: false,
-    no_exercise: false, hair_loss: true,  vit_d: 22
+    weight_gain: true,  skin_darkening: false,  fast_food: false,
+    no_exercise: false,  hair_loss: true,  vit_d: 22
   },
-  low_risk: {
-    // Low risk / non-PCOS — regular cycle, normal labs, no symptoms
-    age: 29,
-    tsh: 2.4,   beta_hcg: 1.0, prl: 12,  endo_thickness: 7,
-    hair_growth: false, pimples: false,
-    lh_fsh: 1.1,
-    irregular_cycle: false, prg: 8.5,
-    follicle_num: 6,    follicle_size: 8.0,  amh: 2.1,
-    bmi: 22.5,  waist: 70,  whr: 0.74,  rbs: 88,
-    weight_gain: false, skin_darkening: false, fast_food: false,
-    no_exercise: false, hair_loss: false, vit_d: 35
+  assessment_deferred: {
+    // Age 12 — within 2 years of menarche onset per 2023 guidelines → "Assessment Deferred"
+    age: 12,
+    irregular_cycle: true,
+    bmi: 22
   }
 };
 
